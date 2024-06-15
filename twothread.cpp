@@ -40,4 +40,9 @@ int main()
     const int nprocessors = 2;
     const int nconsumers = 3;
     const int item_per_producer = 5;
+
+    //thread queues
+
+    threadsafequeue<std::shared_ptr<int>> prod_queue;
+    threadsafequeue<std::shared_ptr<int>> process_queue;
 }
