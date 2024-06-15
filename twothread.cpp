@@ -33,3 +33,11 @@ class threadsafequeue
         std::mutex mutex;
         std::condition_variable condvar;
 };
+
+int main()
+{
+    const int nproducers = 3;
+    const int nprocessors = 2;
+    const int nconsumers = 3;
+    const int item_per_producer = 5;
+}
