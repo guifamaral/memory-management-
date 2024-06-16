@@ -93,18 +93,43 @@ int main()
     std::vector<std::thread> prod_threads;
     for(int i = 0; i < nproducers; i++)
     {
-        prod_threads.emplace_back();
+        prod_threads.emplace_back(producer, std::ref(prod_queue), i, item_per_producer);
     }
 
     std::vector<std::thread> process_threads;
     for(int i = 0; i < nprocessors; i++)
     {
-        process_threads.emplace_back();
+        process_threads.emplace_back(processor, std::ref(prod_queue), std::ref(process_queue), i);
     }
 
     std::vector<std::thread> consumer_threads;
     for(int i = 0; i < nconsumers; i++)
     {
-        consumer_threads.emplace_back();
+        consumer_threads.emplace_back(consumer, std::ref(process_queue), i);
     }
+
+    //join all producer, process and consumer threads 
+
+    for(auto& thread : prod_threads)
+    {
+        thread.join();
+    }
+
+    for(auto& thread : process_threads)
+    {
+        thread.join();
+    }
+
+    for(int i = 0; i < nconsumers - nprocessors; i++)
+    {
+        process_queue.push(std::make_shared<int>(-1));
+    }
+
+    for(auto& thread : consumer_threads)
+    {
+        thread.join();
+    }
+
+    std::cout << "All producers, processosr and consumers have finished processing.";
+    return 0;
 }
