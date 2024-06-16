@@ -34,6 +34,48 @@ class threadsafequeue
         std::condition_variable condvar;
 };
 
+void producer(threadsafequeue<std::shared_ptr<int>>& queue, int id, int nitems)
+{
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(1,100);
+
+    for(int i = 0; i < nitems; i++)
+    {
+        auto value = std::make_shared<int>(dis(gen));
+        queue.push(value);
+        std::cout<< "producer " << id << " produced value " << *value << std::endl;
+    }
+
+    queue.push(std::make_shared<int>(-1));
+}
+
+void processor(threadsafequeue<std::shared_ptr<int>>& input_queue, threadsafequeue<std::shared_ptr<int>>& output_queue, int id)
+{
+    while(true)
+    {
+        auto value = input_queue.pop();
+        if(*value == -1)
+        {
+            output_queue.push(value);
+            break;
+        }
+        *value *= 2;
+        std::cout << "Processor " << id << " processed value to " << *value << std::endl;
+        output_queue.push(value);
+    }
+}
+
+void consumer(threadsafequeue<std::shared_ptr<int>>& queue, int id)
+{
+    while (true)
+    {
+        auto value = queue.pop();
+        if(*value == -1) break;
+        std::cout << "Consumer " << id << " consumed value " << *value << std::endl;
+    }
+}
+
 int main()
 {
     const int nproducers = 3;
