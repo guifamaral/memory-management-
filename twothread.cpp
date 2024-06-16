@@ -45,4 +45,24 @@ int main()
 
     threadsafequeue<std::shared_ptr<int>> prod_queue;
     threadsafequeue<std::shared_ptr<int>> process_queue;
+
+    //create and launch producer threads, processor threads and consumer threads
+
+    std::vector<std::thread> prod_threads;
+    for(int i = 0; i < nproducers; i++)
+    {
+        prod_threads.emplace_back();
+    }
+
+    std::vector<std::thread> process_threads;
+    for(int i = 0; i < nprocessors; i++)
+    {
+        process_threads.emplace_back();
+    }
+
+    std::vector<std::thread> consumer_threads;
+    for(int i = 0; i < nconsumers; i++)
+    {
+        consumer_threads.emplace_back();
+    }
 }
