@@ -34,6 +34,8 @@ class threadsafequeue
         std::condition_variable condvar;
 };
 
+std::mutex cout_mutex;
+
 void producer(threadsafequeue<std::shared_ptr<int>>& queue, int id, int nitems)
 {
     std::random_device rd;
@@ -44,7 +46,11 @@ void producer(threadsafequeue<std::shared_ptr<int>>& queue, int id, int nitems)
     {
         auto value = std::make_shared<int>(dis(gen));
         queue.push(value);
-        std::cout<< "producer " << id << " produced value " << *value << std::endl;
+        {
+            std::lock_guard<std::mutex> lock(cout_mutex);
+            std::cout<< "Producer " << id << " produced value " << *value << std::endl;
+        }
+        
     }
 
     queue.push(std::make_shared<int>(-1));
@@ -61,7 +67,10 @@ void processor(threadsafequeue<std::shared_ptr<int>>& input_queue, threadsafeque
             break;
         }
         *value *= 2;
-        std::cout << "Processor " << id << " processed value to " << *value << std::endl;
+        {
+            std::lock_guard<std::mutex> lock(cout_mutex);            
+            std::cout << "Processor " << id << " processed value to " << *value << std::endl;
+        }
         output_queue.push(value);
     }
 }
@@ -72,7 +81,11 @@ void consumer(threadsafequeue<std::shared_ptr<int>>& queue, int id)
     {
         auto value = queue.pop();
         if(*value == -1) break;
-        std::cout << "Consumer " << id << " consumed value " << *value << std::endl;
+        {
+            std::lock_guard<std::mutex> lock(cout_mutex);
+            std::cout << "Consumer " << id << " consumed value " << *value << std::endl;
+        }
+        
     }
 }
 
@@ -130,6 +143,6 @@ int main()
         thread.join();
     }
 
-    std::cout << "All producers, processosr and consumers have finished processing.";
+    std::cout << "All producers, processors and consumers have finished processing.";
     return 0;
 }
