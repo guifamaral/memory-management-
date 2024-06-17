@@ -25,8 +25,23 @@ class lockfreestack
         {
             T value;
             Node* next;
-            Node(T val) : value(std::move(val), next(nullptr)) {}
+            Node(T val) : value(std::move(val)), next(nullptr) {}
         };
         std::atomic<Node*> head{nullptr};
-        
 };
+
+int main()
+{
+    lockfreestack<int> stack;
+    std::thread p1();
+    std::thread p2();
+    std::thread c1();
+    std::thread c2();
+
+    p1.join();
+    p2.join();
+    c1.join();
+    c2.join();
+
+    return 0;
+}
